@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Image Enhancement Video — Vertical</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500;700&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #1b1b1f;
+        font-family: "Archivo Black", sans-serif;
+        color: #1b1b1f;
+      }
+      .scene-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1080px;
+        height: 1920px;
+      }
+      #reveal-flash {
+        position: absolute;
+        inset: 0;
+        background: #ffffff;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 50;
+        mix-blend-mode: normal;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="21"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- Scene 1 — Hook: "I gave ChatGPT a photo..." + raw photo reveal -->
+      <div
+        id="scene-1"
+        class="scene-layer"
+        data-composition-id="scene1-hook"
+        data-composition-src="compositions/scene1-hook.html"
+        data-start="0"
+        data-duration="3"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+
+      <!-- Scene 2 — Prompt typewriter over photo card -->
+      <div
+        id="scene-2"
+        class="scene-layer"
+        data-composition-id="scene2-prompt"
+        data-composition-src="compositions/scene2-prompt.html"
+        data-start="3"
+        data-duration="7.5"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+
+      <!-- Scene 3 — Dramatic enhanced photo reveal -->
+      <div
+        id="scene-3"
+        class="scene-layer"
+        data-composition-id="scene3-reveal"
+        data-composition-src="compositions/scene3-reveal.html"
+        data-start="10.5"
+        data-duration="5"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+
+      <!-- Scene 4 — CTA: comment + follow -->
+      <div
+        id="scene-4"
+        class="scene-layer"
+        data-composition-id="scene4-cta"
+        data-composition-src="compositions/scene4-cta.html"
+        data-start="15.5"
+        data-duration="5.5"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+
+      <!-- Reveal flash — full-bleed white overlay that fires at the scene 2 → 3 seam.
+           Lives on track-index 9 (above scenes) so it covers the cut. Non-timed
+           because it's controlled directly by the master timeline. -->
+      <div id="reveal-flash"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const mainTl = gsap.timeline({ paused: true });
+
+      // Reveal flash: punch in at 10.4s (just before scene 3 starts at 10.5), peak
+      // at 10.5, fade out by 10.8. White overlay hides the cut from the bright
+      // hype-yellow scene 2 to the deep-black reveal scene 3 — the dramatic beat.
+      mainTl.set("#reveal-flash", { opacity: 0 }, 0);
+      mainTl.to(
+        "#reveal-flash",
+        { opacity: 1, duration: 0.12, ease: "expo.in" },
+        10.38,
+      );
+      mainTl.to(
+        "#reveal-flash",
+        { opacity: 0, duration: 0.32, ease: "power2.out" },
+        10.5,
+      );
+
+      // Pad to exactly data-duration so the final scene doesn't get truncated.
+      mainTl.set({}, {}, 21);
+
+      window.__timelines["main"] = mainTl;
+    </script>
+  </body>
+</html>

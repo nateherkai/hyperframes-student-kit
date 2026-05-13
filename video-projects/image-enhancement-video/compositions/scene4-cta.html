@@ -1,0 +1,222 @@
+<template id="scene4-cta-template">
+  <div
+    data-composition-id="scene4-cta"
+    data-start="0"
+    data-width="1080"
+    data-height="1920"
+    data-duration="5.5"
+  >
+    <div class="s4-bg"></div>
+
+    <div class="s4-headline">
+      <div class="s4-headline-top">WANT THE</div>
+      <div class="s4-headline-bot">PROMPT?</div>
+    </div>
+
+    <div class="s4-tile s4-tile-1">
+      <div class="s4-tile-kicker">STEP 1</div>
+      <div class="s4-tile-big">COMMENT</div>
+      <div class="s4-tile-word">&ldquo;PROMPT&rdquo;</div>
+    </div>
+
+    <div class="s4-tile s4-tile-2">
+      <div class="s4-tile-kicker">STEP 2</div>
+      <div class="s4-tile-big">+ FOLLOW</div>
+      <div class="s4-tile-word">FOR MORE</div>
+    </div>
+
+    <style>
+      [data-composition-id="scene4-cta"] {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      [data-composition-id="scene4-cta"] .s4-bg {
+        position: absolute;
+        inset: 0;
+        background: #ff2d87;
+      }
+      [data-composition-id="scene4-cta"] .s4-headline {
+        position: absolute;
+        top: 130px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        font-family: "Archivo Black", sans-serif;
+        color: #1b1b1f;
+        line-height: 0.92;
+        letter-spacing: -0.02em;
+      }
+      [data-composition-id="scene4-cta"] .s4-headline-top {
+        font-size: 130px;
+      }
+      [data-composition-id="scene4-cta"] .s4-headline-bot {
+        font-size: 220px;
+        color: #ffffff;
+        -webkit-text-stroke: 6px #1b1b1f;
+      }
+      [data-composition-id="scene4-cta"] .s4-tile {
+        position: absolute;
+        left: 50%;
+        width: 880px;
+        padding: 38px 48px 46px 48px;
+        background: #ffffff;
+        border: 6px solid #1b1b1f;
+        border-radius: 32px;
+        box-sizing: border-box;
+        font-family: "Archivo Black", sans-serif;
+        text-align: center;
+        color: #1b1b1f;
+        box-shadow: 14px 14px 0 #1b1b1f;
+      }
+      [data-composition-id="scene4-cta"] .s4-tile-1 {
+        top: 720px;
+        transform: translateX(-50%) rotate(-2.5deg);
+      }
+      [data-composition-id="scene4-cta"] .s4-tile-2 {
+        top: 1180px;
+        transform: translateX(-50%) rotate(2.5deg);
+      }
+      [data-composition-id="scene4-cta"] .s4-tile-kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        color: #ff2d87;
+        margin-bottom: 10px;
+      }
+      [data-composition-id="scene4-cta"] .s4-tile-big {
+        font-size: 110px;
+        letter-spacing: -0.01em;
+        line-height: 1;
+      }
+      [data-composition-id="scene4-cta"] .s4-tile-word {
+        font-size: 130px;
+        letter-spacing: -0.01em;
+        line-height: 1;
+        color: #ff2d87;
+        -webkit-text-stroke: 4px #1b1b1f;
+        margin-top: 6px;
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+        const root = '[data-composition-id="scene4-cta"]';
+
+        // BG punches in.
+        tl.from(
+          root + " .s4-bg",
+          { scale: 1.08, opacity: 0, duration: 0.35, ease: "power3.out" },
+          0,
+        );
+
+        // Headline lines stagger drop.
+        tl.from(
+          root + " .s4-headline-top",
+          { y: -120, opacity: 0, duration: 0.5, ease: "back.out(2.2)" },
+          0.15,
+        );
+        tl.from(
+          root + " .s4-headline-bot",
+          { y: -160, opacity: 0, duration: 0.55, ease: "back.out(2.4)" },
+          0.28,
+        );
+
+        // Tile 1 slides in from the left, stamp settle.
+        tl.from(
+          root + " .s4-tile-1",
+          {
+            x: -1300,
+            y: 0,
+            rotation: -18,
+            opacity: 0,
+            duration: 0.55,
+            ease: "expo.out",
+          },
+          0.55,
+        );
+        tl.to(
+          root + " .s4-tile-1",
+          { scale: 1.06, duration: 0.12, ease: "power2.out" },
+          1.1,
+        );
+        tl.to(
+          root + " .s4-tile-1",
+          { scale: 1.0, duration: 0.22, ease: "back.out(3)" },
+          1.22,
+        );
+
+        // Tile 2 slides in from the right, stamp settle.
+        tl.from(
+          root + " .s4-tile-2",
+          {
+            x: 1300,
+            rotation: 18,
+            opacity: 0,
+            duration: 0.55,
+            ease: "expo.out",
+          },
+          0.9,
+        );
+        tl.to(
+          root + " .s4-tile-2",
+          { scale: 1.06, duration: 0.12, ease: "power2.out" },
+          1.45,
+        );
+        tl.to(
+          root + " .s4-tile-2",
+          { scale: 1.0, duration: 0.22, ease: "back.out(3)" },
+          1.57,
+        );
+
+        // Subtle continuous wobble — keep stillness alive.
+        tl.to(
+          root + " .s4-tile-1",
+          {
+            rotation: -1,
+            duration: 1.2,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: 2,
+          },
+          1.9,
+        );
+        tl.to(
+          root + " .s4-tile-2",
+          {
+            rotation: 1,
+            duration: 1.2,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: 2,
+          },
+          2.2,
+        );
+
+        // Final fade-out — allowed on final scene per framework rule.
+        tl.to(
+          [
+            root + " .s4-headline",
+            root + " .s4-tile-1",
+            root + " .s4-tile-2",
+          ],
+          { opacity: 0, y: -30, duration: 0.45, ease: "power2.in" },
+          5.0,
+        );
+        tl.to(
+          root + " .s4-bg",
+          { opacity: 0, duration: 0.4, ease: "power2.in" },
+          5.1,
+        );
+
+        tl.set({}, {}, 5.5);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["scene4-cta"] = tl;
+      })();
+    </script>
+  </div>
+</template>

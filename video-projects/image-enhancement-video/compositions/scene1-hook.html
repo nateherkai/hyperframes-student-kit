@@ -1,0 +1,173 @@
+<template id="scene1-hook-template">
+  <div
+    data-composition-id="scene1-hook"
+    data-start="0"
+    data-width="1080"
+    data-height="1920"
+    data-duration="3"
+  >
+    <div class="s1-bg"></div>
+
+    <div class="s1-headline-wrap">
+      <div class="s1-line s1-line-top">I GAVE</div>
+      <div class="s1-line s1-line-mid">CHATGPT</div>
+      <div class="s1-line s1-line-bot">THIS PHOTO<span class="s1-arrow">→</span></div>
+    </div>
+
+    <div class="s1-photo-card">
+      <div class="s1-photo-frame">
+        <img class="s1-photo" src="../assets/raw-photo.jpg" alt="raw photo" />
+        <div class="s1-photo-tape"></div>
+      </div>
+    </div>
+
+    <style>
+      [data-composition-id="scene1-hook"] {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      [data-composition-id="scene1-hook"] .s1-bg {
+        position: absolute;
+        inset: 0;
+        background: #ffec3d;
+      }
+      [data-composition-id="scene1-hook"] .s1-headline-wrap {
+        position: absolute;
+        top: 200px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-family: "Archivo Black", sans-serif;
+        color: #1b1b1f;
+        letter-spacing: -0.02em;
+        line-height: 0.92;
+      }
+      [data-composition-id="scene1-hook"] .s1-line {
+        font-size: 160px;
+        text-transform: uppercase;
+      }
+      [data-composition-id="scene1-hook"] .s1-line-bot {
+        font-size: 110px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 18px;
+      }
+      [data-composition-id="scene1-hook"] .s1-arrow {
+        display: inline-block;
+        color: #ff2d87;
+        font-size: 140px;
+        line-height: 1;
+        transform-origin: 50% 50%;
+      }
+      [data-composition-id="scene1-hook"] .s1-photo-card {
+        position: absolute;
+        top: 880px;
+        left: 50%;
+        width: 620px;
+        height: 880px;
+        transform: translateX(-50%) rotate(-3deg);
+        transform-origin: 50% 50%;
+      }
+      [data-composition-id="scene1-hook"] .s1-photo-frame {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #ffffff;
+        padding: 28px 28px 96px 28px;
+        box-shadow:
+          0 30px 60px rgba(27, 27, 31, 0.35),
+          0 12px 24px rgba(27, 27, 31, 0.25);
+        box-sizing: border-box;
+      }
+      [data-composition-id="scene1-hook"] .s1-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        background: #d8d8d8;
+      }
+      [data-composition-id="scene1-hook"] .s1-photo-tape {
+        position: absolute;
+        top: -28px;
+        left: 50%;
+        width: 220px;
+        height: 56px;
+        background: rgba(255, 45, 135, 0.65);
+        transform: translateX(-50%) rotate(-2deg);
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+        const root = '[data-composition-id="scene1-hook"]';
+
+        // Headline lines stagger in from above/below with overshoot.
+        tl.from(
+          root + " .s1-line-top",
+          { y: -160, opacity: 0, duration: 0.55, ease: "back.out(2.2)" },
+          0.1,
+        );
+        tl.from(
+          root + " .s1-line-mid",
+          { y: -200, opacity: 0, duration: 0.55, ease: "back.out(2.2)" },
+          0.22,
+        );
+        tl.from(
+          root + " .s1-line-bot",
+          { y: 60, opacity: 0, duration: 0.5, ease: "back.out(2.4)" },
+          0.42,
+        );
+
+        // Arrow pulse — drawn attention to the photo below.
+        tl.from(
+          root + " .s1-arrow",
+          { scale: 0, rotation: -90, duration: 0.45, ease: "back.out(3)" },
+          0.62,
+        );
+        tl.to(
+          root + " .s1-arrow",
+          { x: 18, duration: 0.25, ease: "sine.inOut", repeat: 5, yoyo: true },
+          1.05,
+        );
+
+        // Photo card flies in from the right with rotation overshoot.
+        tl.from(
+          root + " .s1-photo-card",
+          {
+            x: 1200,
+            rotation: 25,
+            opacity: 0,
+            duration: 0.7,
+            ease: "expo.out",
+          },
+          0.7,
+        );
+
+        // Subtle continuous wobble on the photo card to keep it alive.
+        tl.to(
+          root + " .s1-photo-card",
+          {
+            rotation: -1,
+            duration: 1.0,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: 1,
+          },
+          1.6,
+        );
+
+        tl.set({}, {}, 3);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["scene1-hook"] = tl;
+      })();
+    </script>
+  </div>
+</template>

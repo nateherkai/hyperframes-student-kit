@@ -1,0 +1,160 @@
+<template id="scene3-reveal-template">
+  <div
+    data-composition-id="scene3-reveal"
+    data-start="0"
+    data-width="1080"
+    data-height="1920"
+    data-duration="5"
+  >
+    <div class="s3-bg"></div>
+    <div class="s3-vignette"></div>
+
+    <div class="s3-photo-wrap">
+      <div class="s3-photo-halo"></div>
+      <img class="s3-photo" src="../assets/enhanced-photo.jpg" alt="enhanced photo" />
+    </div>
+
+    <div class="s3-label-wrap">
+      <span class="s3-check">✓</span>
+      <span class="s3-label-text">ENHANCED</span>
+    </div>
+
+    <style>
+      [data-composition-id="scene3-reveal"] {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      [data-composition-id="scene3-reveal"] .s3-bg {
+        position: absolute;
+        inset: 0;
+        background: #1b1b1f;
+      }
+      [data-composition-id="scene3-reveal"] .s3-vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(27, 27, 31, 0) 35%,
+          rgba(27, 27, 31, 0.7) 100%
+        );
+        pointer-events: none;
+      }
+      [data-composition-id="scene3-reveal"] .s3-photo-wrap {
+        position: absolute;
+        top: 200px;
+        left: 50%;
+        width: 800px;
+        height: 1333px;
+        transform: translateX(-50%);
+      }
+      [data-composition-id="scene3-reveal"] .s3-photo-halo {
+        position: absolute;
+        inset: -40px;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(255, 255, 255, 0.18) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        filter: blur(30px);
+        pointer-events: none;
+      }
+      [data-composition-id="scene3-reveal"] .s3-photo {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        background: #2a2a2e;
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.6),
+          0 0 0 1px rgba(255, 255, 255, 0.08);
+      }
+      [data-composition-id="scene3-reveal"] .s3-label-wrap {
+        position: absolute;
+        bottom: 110px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 40px;
+        font-weight: 700;
+        letter-spacing: 0.32em;
+        color: #ffffff;
+      }
+      [data-composition-id="scene3-reveal"] .s3-check {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: #00e5ff;
+        color: #1b1b1f;
+        font-size: 30px;
+        letter-spacing: 0;
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+        const root = '[data-composition-id="scene3-reveal"]';
+
+        // The dramatic beat: photo enters slowly. Slower than any other entrance
+        // in the piece — stillness sells the payoff.
+        tl.from(
+          root + " .s3-photo-wrap",
+          {
+            y: 80,
+            scale: 0.94,
+            opacity: 0,
+            duration: 0.85,
+            ease: "power2.out",
+          },
+          0,
+        );
+
+        // Halo gently brightens after the photo settles.
+        tl.from(
+          root + " .s3-photo-halo",
+          { opacity: 0, duration: 0.8, ease: "power1.out" },
+          0.4,
+        );
+
+        // Ken Burns — slow continuous camera-feel zoom across the full beat.
+        tl.fromTo(
+          root + " .s3-photo",
+          { scale: 1 },
+          { scale: 1.04, duration: 4.5, ease: "none" },
+          0.3,
+        );
+
+        // ENHANCED label arrives a beat after the photo lands.
+        tl.from(
+          root + " .s3-check",
+          { scale: 0, duration: 0.4, ease: "back.out(3)" },
+          1.0,
+        );
+        tl.from(
+          root + " .s3-label-text",
+          {
+            x: -40,
+            opacity: 0,
+            duration: 0.45,
+            ease: "power3.out",
+          },
+          1.15,
+        );
+
+        tl.set({}, {}, 5);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["scene3-reveal"] = tl;
+      })();
+    </script>
+  </div>
+</template>

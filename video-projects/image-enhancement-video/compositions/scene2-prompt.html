@@ -1,0 +1,250 @@
+<template id="scene2-prompt-template">
+  <div
+    data-composition-id="scene2-prompt"
+    data-start="0"
+    data-width="1080"
+    data-height="1920"
+    data-duration="7.5"
+  >
+    <div class="s2-bg"></div>
+
+    <div class="s2-input-label">INPUT</div>
+
+    <div class="s2-photo-card">
+      <div class="s2-photo-frame">
+        <img class="s2-photo" src="../assets/raw-photo.jpg" alt="raw photo" />
+      </div>
+    </div>
+
+    <div class="s2-prompt-box">
+      <div class="s2-prompt-tag">
+        <span class="s2-prompt-dot"></span>
+        PROMPT
+      </div>
+      <div class="s2-prompt-text-wrap">
+        <span class="s2-prompt-text"></span><span class="s2-caret">▍</span>
+      </div>
+    </div>
+
+    <style>
+      [data-composition-id="scene2-prompt"] {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      [data-composition-id="scene2-prompt"] .s2-bg {
+        position: absolute;
+        inset: 0;
+        background: #ffec3d;
+      }
+      [data-composition-id="scene2-prompt"] .s2-input-label {
+        position: absolute;
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%) rotate(-2deg);
+        font-family: "Archivo Black", sans-serif;
+        font-size: 64px;
+        color: #1b1b1f;
+        background: #ffffff;
+        padding: 10px 32px;
+        letter-spacing: 0.04em;
+        box-shadow: 6px 6px 0 #1b1b1f;
+      }
+      [data-composition-id="scene2-prompt"] .s2-photo-card {
+        position: absolute;
+        top: 180px;
+        left: 50%;
+        width: 460px;
+        height: 640px;
+        transform: translateX(-50%) rotate(-2deg);
+        background: #ffffff;
+        padding: 22px 22px 64px 22px;
+        box-sizing: border-box;
+        box-shadow:
+          0 24px 50px rgba(27, 27, 31, 0.35),
+          0 8px 18px rgba(27, 27, 31, 0.25);
+      }
+      [data-composition-id="scene2-prompt"] .s2-photo-frame {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      [data-composition-id="scene2-prompt"] .s2-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        background: #d8d8d8;
+      }
+      [data-composition-id="scene2-prompt"] .s2-prompt-box {
+        position: absolute;
+        top: 940px;
+        left: 60px;
+        width: 960px;
+        height: 880px;
+        background: #1b1b1f;
+        border: 6px solid #ff2d87;
+        border-radius: 36px;
+        padding: 48px 56px;
+        box-sizing: border-box;
+        box-shadow: 12px 12px 0 #ff2d87;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+      [data-composition-id="scene2-prompt"] .s2-prompt-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 32px;
+        font-weight: 700;
+        color: #ff2d87;
+        letter-spacing: 0.18em;
+        align-self: flex-start;
+      }
+      [data-composition-id="scene2-prompt"] .s2-prompt-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #ff2d87;
+        box-shadow: 0 0 18px #ff2d87;
+      }
+      [data-composition-id="scene2-prompt"] .s2-prompt-text-wrap {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 34px;
+        font-weight: 500;
+        line-height: 1.42;
+        color: #ffffff;
+        word-break: break-word;
+      }
+      [data-composition-id="scene2-prompt"] .s2-prompt-text {
+        white-space: pre-wrap;
+      }
+      [data-composition-id="scene2-prompt"] .s2-caret {
+        display: inline-block;
+        color: #00e5ff;
+        margin-left: 2px;
+        transform: translateY(2px);
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+        const root = '[data-composition-id="scene2-prompt"]';
+
+        const prompt =
+          "A black and white photo of the man in this photo with shadow., in the style of minimalist beauty, light bronze and bronze, serene faces, sharp edges, karencore, high definition, contrast shading, realism --ar 3:5 --stylize 750 --v 6.0 --style raw";
+
+        // Background slams in via subtle scale punch.
+        tl.from(
+          root + " .s2-bg",
+          { scale: 1.05, opacity: 0, duration: 0.3, ease: "power3.out" },
+          0,
+        );
+
+        // "INPUT" badge rotates in with bounce.
+        tl.from(
+          root + " .s2-input-label",
+          {
+            y: -120,
+            rotation: -20,
+            opacity: 0,
+            duration: 0.45,
+            ease: "back.out(2.4)",
+          },
+          0.15,
+        );
+
+        // Photo card drops in from above.
+        tl.from(
+          root + " .s2-photo-card",
+          {
+            y: -800,
+            rotation: 8,
+            opacity: 0,
+            duration: 0.6,
+            ease: "expo.out",
+          },
+          0.3,
+        );
+
+        // Prompt box pushes up from below.
+        tl.from(
+          root + " .s2-prompt-box",
+          {
+            y: 1000,
+            opacity: 0,
+            duration: 0.55,
+            ease: "expo.out",
+          },
+          0.55,
+        );
+
+        // PROMPT tag pops in.
+        tl.from(
+          root + " .s2-prompt-tag",
+          { scale: 0, duration: 0.35, ease: "back.out(3)" },
+          0.95,
+        );
+
+        // Caret blink — finite repeat count derived from typing duration.
+        // Caret visible from t=1.1 onward. Blink cycle 0.6s. Show for ~5.8s = 9 cycles.
+        const caretEl = document.querySelector(root + " .s2-caret");
+        if (caretEl) {
+          tl.set(caretEl, { opacity: 1 }, 1.1);
+          tl.to(
+            caretEl,
+            {
+              opacity: 0,
+              duration: 0.3,
+              ease: "steps(1)",
+              yoyo: true,
+              repeat: 17, // 18 toggles ≈ 5.4s of blinking
+            },
+            1.1,
+          );
+        }
+
+        // Typewriter — advance a counter, slice the prompt string on each tick.
+        const promptEl = document.querySelector(root + " .s2-prompt-text");
+        const state = { chars: 0 };
+        tl.to(
+          state,
+          {
+            chars: prompt.length,
+            duration: 5.0,
+            ease: "none",
+            snap: { chars: 1 },
+            onUpdate: function () {
+              if (promptEl) {
+                promptEl.textContent = prompt.slice(0, Math.round(state.chars));
+              }
+            },
+          },
+          1.2,
+        );
+
+        // Subtle photo-card wobble during the long typing beat.
+        tl.to(
+          root + " .s2-photo-card",
+          {
+            rotation: -3.5,
+            duration: 1.6,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: 2,
+          },
+          1.4,
+        );
+
+        tl.set({}, {}, 7.5);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["scene2-prompt"] = tl;
+      })();
+    </script>
+  </div>
+</template>
