@@ -32,3 +32,16 @@ raw-media/
 **/renders/frames/
 **/renders/frames-*/
 
+
+# Obsidian editor state
+.obsidian/
+
+# Studio preview caches
+**/.thumbnails/
+**/.waveform-cache/
+
+# fresh-cut raw footage (several files exceed GitHub's 100MB limit; lives locally + on the home server)
+video-projects/fresh-cut/assets/
+
+# Hyperframes editor auto-backups
+**/.hyperframes/backup/

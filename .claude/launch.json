@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["hyperframes", "preview", "video-projects/claude-edit-intro", "--port", "3010", "--force-new"],
       "port": 3010
+    },
+    {
+      "name": "studio-app",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/home/Master Project/Second Brain/App Builds/studio", "run", "dev"],
+      "port": 5173
     }
   ]
 }
