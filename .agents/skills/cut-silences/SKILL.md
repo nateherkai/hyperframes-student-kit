@@ -80,4 +80,24 @@ The JSON summary printed to stdout includes `removed`, `removedPct`, range count
 
 ## Hand-off to the next agent
 
-Pass `<stem>.silence-transcript.json` (and the `silenced.mp4` if rendered) to the **cut-mistakes** agent. Because timestamps are already on the edited timeline, downstream beat timing and `scripts/validate-beat-sync.mjs` work without further adjustment.
+Pass `<stem>.silence-transcript.json` (and the `silenced.mp4` if rendered) to the **cut-mistakes** agent.
+
+## Known limitation: retimed-transcript precision
+
+`<stem>.silence-transcript.json`'s word timings are computed by exact float
+subtraction, then the same floats are fed to ffmpeg's `trim`/`atrim`, which
+can only cut on real frame boundaries. Each cut's actual rendered position
+can therefore differ from the math by a fraction of a frame, and a typical
+silence pass makes 100-300+ cuts, so the error compounds. Boundaries are now
+snapped to the nearest real frame (via `ffprobe`'s `r_frame_rate` when
+`--video` is given) before computing anything, which substantially reduces
+drift but — measured on real camera footage — does not fully eliminate it
+(real frame spacing isn't perfectly uniform; expect low-single-digit
+milliseconds of residual drift per cut, which can add up to a real offset
+across hundreds of cuts). Do not assume this file's timestamps land exactly
+on the right word in `silenced.mp4` once cut-mistakes (or anything else) has
+compounded more cuts on top — for anything requiring frame-accurate timing
+against the actual rendered video, re-transcribe that video directly for the
+region you need, and re-transcribe any final render to diff against intended
+text before calling a cut "done". A locked-off single camera shot looks
+identical a second early, so frame strips alone won't catch this.

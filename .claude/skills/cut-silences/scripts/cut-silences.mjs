@@ -103,6 +103,32 @@ if (!Number.isFinite(duration)) {
 }
 if (!Number.isFinite(duration)) duration = words.at(-1).end + opts.tailPad;
 
+// ---- frame rate (for boundary snapping, video renders only) ----
+// ffmpeg's trim/atrim filters cut on real source frame boundaries, not exact
+// float seconds. If the retimed transcript is computed from un-snapped floats,
+// each cut's actual rendered position silently differs from the math by a
+// fraction of a frame, and that error compounds linearly with cut count (a
+// typical silence pass makes 100-300+ cuts). Snapping every delete-range edge
+// to the nearest real frame time BEFORE computing anything downstream keeps
+// the retimed transcript closer to what ffmpeg actually renders. Only
+// meaningful (and only applied) when --video is given -- with no video there
+// is no rendered file to drift from, and snapping would just add pointless
+// rounding to an otherwise-exact edit.
+let fps = null;
+if (opts.video && existsSync(resolve(opts.video))) {
+  fps = 30;
+  const probe = spawnSync("ffprobe", [
+    "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=r_frame_rate",
+    "-of", "default=noprint_wrappers=1:nokey=1", resolve(opts.video),
+  ]);
+  const raw = probe.stdout?.toString().trim();
+  if (raw && raw.includes("/")) {
+    const [n, d] = raw.split("/").map(Number);
+    if (Number.isFinite(n) && Number.isFinite(d) && d > 0) fps = n / d;
+  } else if (Number.isFinite(Number(raw))) fps = Number(raw);
+}
+const snap = (t) => (fps ? Math.round(t * fps) / fps : t);
+
 // ---- build the delete ranges (silence only) ----
 function mergeRanges(ranges) {
   const sorted = ranges
@@ -147,7 +173,7 @@ for (let i = 1; i < words.length; i++) {
   }
 }
 
-const mergedDeletes = mergeRanges(deleteRanges);
+const mergedDeletes = mergeRanges(deleteRanges).map((r) => ({ ...r, start: snap(r.start), end: snap(r.end) })).filter((r) => r.end > r.start);
 
 // ---- keep ranges = the complement of the deletes ----
 const keepRanges = [];
@@ -255,6 +281,7 @@ writeFileSync(decPath, decisions);
 
 const summary = {
   sourceDuration: Number(duration.toFixed(3)),
+  fps,
   editedDuration,
   removed: Number(removedTotal.toFixed(3)),
   removedPct: Number(((removedTotal / duration) * 100).toFixed(1)),

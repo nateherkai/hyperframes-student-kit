@@ -65,6 +65,33 @@ node scripts/build-edl-review.mjs <stem>.mistakes-edl.json \
 npx serve . -p 8080 -n
 ```
 
+## Known limitation: retimed-transcript precision (read before reusing timestamps downstream)
+
+`apply-cuts.mjs` computes `<stem>.mistakes-transcript.json`'s word timings by
+exact float subtraction, then feeds those same floats to ffmpeg's
+`trim`/`atrim`. ffmpeg can only cut on real frame boundaries, so each cut's
+actual rendered position can differ from the math by a fraction of a frame,
+and — because this runs after `cut-silences`, which typically makes 100-300+
+cuts of its own — the error compounds across two stages. The script now
+snaps every cut boundary to the nearest real frame (via `ffprobe`'s
+`r_frame_rate` when `--video` is given) before computing anything, which
+substantially reduces drift, but testing found it does not fully eliminate
+it on real camera footage (frame spacing isn't perfectly uniform) — expect
+low-single-digit milliseconds of residual drift per cut, which can still add
+up to a noticeable offset (measured: ~0.3s across 45 cuts on real footage)
+on a file with many cuts.
+
+**Practical rule**: if you need this transcript's timestamps to point at
+exact words in the *rendered* video — for another cutting pass, a beat-sync
+tool, or anything requiring frame-accurate timing — do not trust
+`<stem>.mistakes-transcript.json` on its own once more than a few dozen cuts
+have been applied (by this tool or by `cut-silences` before it). Re-transcribe
+the actual rendered video directly for the region you need, and — before
+calling any such downstream cut "done" — re-transcribe the *final render*
+and diff it against the intended text. Frame strips / contact sheets alone
+cannot catch this: a locked-off single-camera shot looks identical a second
+early.
+
 ## Notes
 
 - A very clean delivery may yield few or zero real cuts — that's a valid outcome; don't cut natural speech to hit a quota.
