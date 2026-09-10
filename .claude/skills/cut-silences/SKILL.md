@@ -82,22 +82,28 @@ The JSON summary printed to stdout includes `removed`, `removedPct`, range count
 
 Pass `<stem>.silence-transcript.json` (and the `silenced.mp4` if rendered) to the **cut-mistakes** agent.
 
-## Known limitation: retimed-transcript precision
+## Retimed-transcript precision
 
-`<stem>.silence-transcript.json`'s word timings are computed by exact float
-subtraction, then the same floats are fed to ffmpeg's `trim`/`atrim`, which
-can only cut on real frame boundaries. Each cut's actual rendered position
-can therefore differ from the math by a fraction of a frame, and a typical
-silence pass makes 100-300+ cuts, so the error compounds. Boundaries are now
-snapped to the nearest real frame (via `ffprobe`'s `r_frame_rate` when
-`--video` is given) before computing anything, which substantially reduces
-drift but — measured on real camera footage — does not fully eliminate it
-(real frame spacing isn't perfectly uniform; expect low-single-digit
-milliseconds of residual drift per cut, which can add up to a real offset
-across hundreds of cuts). Do not assume this file's timestamps land exactly
-on the right word in `silenced.mp4` once cut-mistakes (or anything else) has
-compounded more cuts on top — for anything requiring frame-accurate timing
-against the actual rendered video, re-transcribe that video directly for the
-region you need, and re-transcribe any final render to diff against intended
-text before calling a cut "done". A locked-off single camera shot looks
-identical a second early, so frame strips alone won't catch this.
+`<stem>.silence-transcript.json` only lines up with `silenced.mp4` if every
+cut lands on a real frame. Two things have to hold, and originally neither
+did:
+
+1. Delete-range edges are snapped to the nearest source frame (via
+   `ffprobe`'s `r_frame_rate`, only when `--video` is given) before any
+   retiming math.
+2. The filtergraph writes those times at microsecond precision. At
+   millisecond precision a 30fps boundary (33.333…ms) rounds past the frame's
+   real timestamp, ffmpeg drops the boundary frame, video runs one frame
+   short of its sample-exact audio, and `concat` shifts every later segment
+   by a few ms — always in the same direction. Across a few hundred cuts that
+   compounded to 1–3s.
+
+Measured on one identical 45-cut clip: pre-fix drift 0.27s at the end of the
+file; snap-only (ms precision) 0.31s — no improvement; snap + µs precision
+0.01s, with the rendered duration matching the transcript's claim exactly.
+
+Still re-transcribe the final render and diff it against the intended text
+before calling any downstream cut done. Transcription timing itself has
+~10–100ms of jitter, variable-frame-rate sources are not handled, and a
+locked-off single-camera shot looks identical a second early in a frame
+strip — that check is the only thing that catches a uniform time offset.

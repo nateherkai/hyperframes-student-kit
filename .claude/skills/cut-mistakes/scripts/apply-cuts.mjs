@@ -146,8 +146,8 @@ function buildFilterScript(ranges) {
   const lines = [];
   for (let i = 0; i < ranges.length; i++) {
     const r = ranges[i];
-    lines.push(`[0:v]trim=start=${r.start.toFixed(3)}:end=${r.end.toFixed(3)},setpts=PTS-STARTPTS[v${i}];`);
-    lines.push(`[0:a]atrim=start=${r.start.toFixed(3)}:end=${r.end.toFixed(3)},asetpts=PTS-STARTPTS[a${i}];`);
+    lines.push(`[0:v]trim=start=${r.start.toFixed(6)}:end=${r.end.toFixed(6)},setpts=PTS-STARTPTS[v${i}];`);
+    lines.push(`[0:a]atrim=start=${r.start.toFixed(6)}:end=${r.end.toFixed(6)},asetpts=PTS-STARTPTS[a${i}];`);
   }
   lines.push(`${ranges.map((_, i) => `[v${i}][a${i}]`).join("")}concat=n=${ranges.length}:v=1:a=1[v][a]`);
   return lines.join("\n");
