@@ -327,6 +327,13 @@ Skip on small edits (fixing a color, adjusting one duration). Run on new composi
 
 ## References (loaded on demand)
 
+- **[references/lecciones-medidas.md](references/lecciones-medidas.md)** — ⭐ **Leer primero.**
+  Lo aprendido produciendo contra las 22 referencias del board, medido en vez de estimado:
+  las trampas del motor de captura por seek, la escala real de un travelling, cómo se
+  ilumina un objeto, por qué no se puede medir texto antes de `document.fonts.ready`,
+  los siete layouts de composición, el ritmo, el audio y el método de verificación.
+  **Donde contradiga al resto del skill, gana: está medido.**
+
 - **[references/captions.md](references/captions.md)** — Captions, subtitles, lyrics, karaoke synced to audio. Tone-adaptive style detection, per-word styling, text overflow prevention, caption exit guarantees, word grouping. Read when adding any text synced to audio timing.
 - **[references/tts.md](references/tts.md)** — Text-to-speech with Kokoro-82M. Voice selection, speed tuning, TTS+captions workflow. Read when generating narration or voiceover.
 - **[references/audio-reactive.md](references/audio-reactive.md)** — Audio-reactive animation: map frequency bands and amplitude to GSAP properties. Read when visuals should respond to music, voice, or sound.
