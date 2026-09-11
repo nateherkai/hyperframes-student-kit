@@ -29,6 +29,14 @@ puede caer después del fundido y dejar visibilidad obsoleta.
 No existe estela natural. Regla: *lo que se mueve rápido se desenfoca en la
 dirección en que se mueve, y recupera el foco al frenar.* A 60 fps no es opcional.
 
+### 🚨 Los valores relativos (`+=`, `-=`) rompen bajo render en paralelo
+Un valor relativo **captura su base al inicializar el tween**. El render reparte
+la pieza en tramos entre varios workers: uno inicializa a mitad de vuelo del
+tween anterior y otro arranca en frío con el estado final — **el mismo cuadro
+sale en dos posiciones distintas**, y se ve como un salto en el límite del tramo.
+Va siempre `fromTo` con extremos explícitos, para que cualquier camino de seek
+resuelva al mismo estado. (El lint lo llama `gsap_relative_value_second_writer`.)
+
 ### Dos tweens sobre la misma propiedad: el que termina después gana
 Cuando algo "no obedece", **buscar el otro tween que lo está pisando** antes de
 tocar el valor. El lint avisa (`overlapping_gsap_tweens`) y hay que hacerle caso.
