@@ -27,10 +27,10 @@ function die(m, c = 1) { console.error(m); exit(c); }
 
 const args = argv.slice(2);
 if (args.length === 0 || args.includes("--help")) {
-  console.log("Usage: node apply-cuts.mjs <transcript.json> --cuts <approved.json> [--video in.mp4] [--output out.mp4] [--out-dir dir] [--apply]");
+  console.log("Usage: node apply-cuts.mjs <transcript.json> --cuts <approved.json> [--video in.mp4] [--output out.mp4] [--out-dir dir] [--apply] [--no-snap-audio]");
   exit(args.length === 0 ? 1 : 0);
 }
-const opts = { transcript: null, cuts: null, video: null, output: null, outDir: null, apply: false };
+const opts = { transcript: null, cuts: null, video: null, output: null, outDir: null, apply: false, snapAudio: true };
 for (let i = 0; i < args.length; i++) {
   const a = args[i];
   if (a === "--cuts") opts.cuts = args[++i];
@@ -38,6 +38,7 @@ for (let i = 0; i < args.length; i++) {
   else if (a === "--output" || a === "-o") opts.output = args[++i];
   else if (a === "--out-dir") opts.outDir = args[++i];
   else if (a === "--apply") opts.apply = true;
+  else if (a === "--no-snap-audio") opts.snapAudio = false;
   else if (a.startsWith("--")) die(`unknown option: ${a}`);
   else if (!opts.transcript) opts.transcript = a;
 }
@@ -105,7 +106,26 @@ function mergeRanges(ranges) {
   }
   return merged;
 }
-const mergedDeletes = mergeRanges(approved).map((r) => ({ ...r, start: snap(r.start), end: snap(r.end) })).filter((r) => r.end > r.start);
+// ---- audio-guided edges (video renders only, default on) ----
+// A cut placed exactly at an ASR word edge usually clips the onset of the
+// next word or leaves the tail of the last one, because word timestamps are
+// 50-150ms coarse. Before frame snapping, move each delete edge to the
+// quietest 30ms nearby, never past the neighbouring kept words.
+let audioSnapped = false;
+let rangesForRender = mergeRanges(approved);
+if (fps && opts.snapAudio) {
+  const { extractWav, loadWav, snapRange } = await import(new URL("../../../../scripts/lib/audio-edges.mjs", import.meta.url));
+  const outDirEarly = opts.outDir ? resolve(opts.outDir) : dirname(transcriptPath);
+  mkdirSync(outDirEarly, { recursive: true });
+  const wav = loadWav(extractWav(resolve(opts.video), join(outDirEarly, `${basename(resolve(opts.video), extname(opts.video))}.16k.wav`)));
+  rangesForRender = rangesForRender.map((r) => {
+    const prevKept = words.filter((w) => w.end <= r.start).at(-1);
+    const nextKept = words.find((w) => w.start >= r.end);
+    return snapRange(wav, r, { prevEnd: prevKept ? prevKept.end : 0, nextStart: nextKept ? nextKept.start : duration });
+  });
+  audioSnapped = true;
+}
+const mergedDeletes = rangesForRender.map((r) => ({ ...r, start: snap(r.start), end: snap(r.end) })).filter((r) => r.end > r.start);
 
 const keepRanges = [];
 let cursor = 0;
@@ -174,7 +194,7 @@ writeFileSync(join(outDir, `${stem}.mistakes-decisions.md`), [
 ].join("\n"));
 
 const summary = {
-  inputDuration: Number(duration.toFixed(3)), fps, editedDuration,
+  inputDuration: Number(duration.toFixed(3)), fps, audioSnapped, editedDuration,
   removed: Number(removedTotal.toFixed(3)), removedPct: Number(((removedTotal / duration) * 100).toFixed(1)),
   cuts: mergedDeletes.length, editedWords: editedWords.length, outDir,
 };
