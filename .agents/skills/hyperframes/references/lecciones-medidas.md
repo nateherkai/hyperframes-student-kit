@@ -142,6 +142,18 @@ Cualquier otra necesita un `@font-face` real con su `.woff2` — y las reglas ha
 que **pegarlas inline**: un `@import` a un `.css` externo el compilador no lo ve.
 `scripts/lab/getfont.mjs` baja cualquier Google Font y arma el bloque.
 
+### Logos de marca reales
+`scripts/lab/logos.mjs` los baja del CDN de **Simple Icons**
+(`cdn.simpleicons.org/<slug>`), sin API key y con el **color oficial de cada
+marca**. Se bajan al proyecto en vez de enlazarlos: el motor renderiza sin red
+garantizada y una composición tiene que ser reproducible offline.
+
+⚠️ **No todas las marcas están.** Adobe, Canva, Slack y OpenAI devuelven **404**:
+pidieron que no se use su logo. La herramienta lo reporta en vez de tragárselo.
+
+🔑 **El logo va sobre una pastilla blanca, y eso no es decoración.** Notion,
+Vercel, GitHub y OBS son casi negros: sobre fondo oscuro desaparecen.
+
 ---
 
 ## 5 · Composición del texto
@@ -173,8 +185,12 @@ es el anclaje **entre bloques y entre actos**.
 Piso **122 px** (11 %). Sangrar el objeto sí; **cortar una palabra a la mitad, no**
 — eso lee a desborde, no a recorte.
 
+**El color vive en los objetos, no en las letras.** Texto blanco sobre oscuro o
+negro sobre claro. Si el texto compite en color con el objeto, hay dos cosas
+peleando por el mismo trabajo.
+
 **Jerarquía adentro del bloque:** una palabra manda, notoriamente más grande y en
-el peso más pesado; las secundarias finas y **en gris**, nunca en el mismo color.
+el peso más pesado; las secundarias finas y **en gris**, nunca en un color de acento.
 Un salto de cuerpo de 2.7× es lo que lo hace leer como jerarquía y no como lista.
 
 ---
