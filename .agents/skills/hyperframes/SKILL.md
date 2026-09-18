@@ -327,7 +327,7 @@ Skip on small edits (fixing a color, adjusting one duration). Run on new composi
 
 ## References (loaded on demand)
 
-- **[../../scripts/lab/README.md](../../scripts/lab/README.md)** — las siete herramientas de
+- **[../../../scripts/lab/README.md](../../../scripts/lab/README.md)** — las siete herramientas de
   medición y master del laboratorio, y el orden en que se usan. Leer antes de dar
   una pieza por terminada.
 - **[references/lecciones-medidas.md](references/lecciones-medidas.md)** — ⭐ **Leer primero.**
