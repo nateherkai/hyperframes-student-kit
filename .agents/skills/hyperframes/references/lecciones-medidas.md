@@ -1,12 +1,12 @@
 # Lecciones medidas
 
-Lo aprendido produciendo **48 piezas** contra 23 referencias de motion graphics
+Lo aprendido produciendo **50 piezas** contra 23 referencias de motion graphics
 reales (recolectadas aparte; el repo no las incluye), **midiendo cada afirmación
-en vez de estimarla**.
+en vez de estimarla** — y contra las skills que el propio motor publica.
 
 **Cuando algo de acá contradiga al resto del skill, gana esto: está medido.**
 
-Noventa lecciones agrupadas por el momento en que hacen falta. Si vas a empezar
+Noventa y tres lecciones agrupadas por el momento en que hacen falta. Si vas a empezar
 una pieza, el orden útil es: *El motor* → *Fluidez* → *Composición* → *Color*.
 Las de *Objetos y técnicas* son un catálogo para consultar cuando hace falta una.
 
@@ -38,7 +38,7 @@ Las de *Objetos y técnicas* son un catálogo para consultar cuando hace falta u
 - [Tiempo de lectura](#tiempo-de-lectura)
 - [Copiar antes que inventar](#copiar-antes-que-inventar)
 - [Revelar texto: por letra, y construir apilando](#revelar-texto-por-letra-y-construir-apilando)
-- [🆕 El cursor de un tipeo se lee del layout, no se estima](#el-cursor-de-un-tipeo-se-lee-del-layout-no-se-estima)
+- [🆕 Tipeo: las dos recetas sirven, y se diferencian en el CURSOR](#tipeo-las-dos-recetas-sirven-y-se-diferencian-en-el-cursor)
 - [Hacer que el color "viaje" entre objetos](#hacer-que-el-color-viaje-entre-objetos)
 - [Una fila de píldoras se sale del cuadro antes de lo que parece](#una-fila-de-píldoras-se-sale-del-cuadro-antes-de-lo-que-parece)
 - [El texto no va encima del objeto](#el-texto-no-va-encima-del-objeto)
@@ -92,7 +92,7 @@ Las de *Objetos y técnicas* son un catálogo para consultar cuando hace falta u
 - [Los silencios de la locución son los puntos de corte](#los-silencios-de-la-locución-son-los-puntos-de-corte)
 
 **Movimiento: curvas, barrido y ritmo**
-- [No hay obturador: **todo el motion blur es autoreado**](#no-hay-obturador-todo-el-motion-blur-es-autoreado)
+- [🔄 El obturador SÍ existe: `npx hyperframes add motion-blur`](#el-obturador-sí-existe-npx-hyperframes-add-motion-blur)
 - [Para que algo viaje sobre su propio eje, la rotación va en el envoltorio](#para-que-algo-viaje-sobre-su-propio-eje-la-rotación-va-en-el-envoltorio)
 - [Un elemento rotado se mide contra la DIAGONAL](#un-elemento-rotado-se-mide-contra-la-diagonal)
 - [Varias escenas: se anima el contenedor, y el fondo no corta](#varias-escenas-se-anima-el-contenedor-y-el-fondo-no-corta)
@@ -104,11 +104,14 @@ Las de *Objetos y técnicas* son un catálogo para consultar cuando hace falta u
 - [Movimiento reactivo al audio: un valor por cuadro](#movimiento-reactivo-al-audio-un-valor-por-cuadro)
 
 **Entrega y formatos**
+- [🆕 Una composición, N videos: `--variables` y `--batch`](#una-composición-n-videos---variables-y---batch)
+- [🆕 Las salidas que no son MP4](#las-salidas-que-no-son-mp4)
 - [Entrega: el render del motor es mucho más pesado de lo necesario](#entrega-el-render-del-motor-es-mucho-más-pesado-de-lo-necesario)
 - [Zona segura de Instagram, verificada](#zona-segura-de-instagram-verificada)
 
 **Método e instrumentos**
-- [🚨 Los valores relativos (`+=`, `-=`) rompen bajo render en paralelo](#los-valores-relativos-rompen-bajo-render-en-paralelo)
+- [🆕 🚨 El motor se mueve todos los días: mirar la versión antes de creerle a esta hoja](#el-motor-se-mueve-todos-los-días-mirar-la-versión-antes-de-creerle-a-esta-hoja)
+- [🚨 Los valores relativos (`+=`, `-=`) rompen bajo render en paralelo](#los-valores-relativos--rompen-bajo-render-en-paralelo)
 - [Y un límite del propio motor](#y-un-límite-del-propio-motor)
 - [Mirar a resolución completa, no en miniaturas](#mirar-a-resolución-completa-no-en-miniaturas)
 - [⭐ El A/B pareado por timestamp](#el-ab-pareado-por-timestamp)
@@ -384,11 +387,23 @@ un borde de 7 px, un color que sube hasta invertir el texto.
 - `white-space: nowrap` en el contenedor: sin eso la última palabra puede
   provocar un salto de renglón a mitad de la construcción, y el reflow se ve.
 
-### El cursor de un tipeo se lee del layout, no se estima
+### Tipeo: las dos recetas sirven, y se diferencian en el CURSOR
 
-Para que el cursor viaje pegado al texto que aparece, cada carácter va en su
-propio `<span>` con `opacity: 0` en CSS —invisible pero **ocupando lugar**—, y
-la posición sale del layout ya resuelto:
+Hay dos formas, y **las dos sobreviven a la captura por seek** — medido con un
+A/B pareado renderizado a 4 workers, donde cada worker arranca en mitad de la
+línea de tiempo:
+
+- **`tl.call()` + `textContent`** (la receta de `skills/hyperframes-animation`
+  río arriba). Funciona. Y como el texto crece de verdad, **un cursor en línea
+  viaja gratis**, sin calcular nada.
+- **Un `<span>` por carácter revelado con `tl.set`**. También funciona, y es la
+  única que permite animar cada glifo por separado.
+
+🚨 **La diferencia está en el cursor, y es la que sorprende.** Con la segunda,
+los caracteres invisibles **siguen ocupando su lugar**: un cursor en línea se
+para después de la palabra completa desde el cuadro cero, no donde va el tipeo.
+Medido, se ve clavado a media línea de distancia del texto. Por eso, si se
+revela por spans, la posición del cursor **se lee del layout**:
 
 ```js
 linea.innerHTML = [...FRASE].map(c => `<span>${c === ' ' ? '&nbsp;' : c}</span>`).join('');
@@ -404,6 +419,11 @@ Se puede leer `offsetLeft` en la construcción de la línea de tiempo porque **e
 compilador embebe la fuente y ya está resuelta al cargar**: es sincrónico y
 determinista. Estimar el ancho por carácter falla con cualquier tipografía que
 no sea monoespaciada, y falla distinto en cada palabra.
+
+⚠️ **Y la trampa que costó un render:** si el contenedor de los spans es él
+mismo un `<span>`, una regla como `.caja span {opacity: 0}` lo apaga *a él*, y
+la opacidad de un padre no se recupera desde el hijo. El tipeo no aparece nunca.
+Scopear la regla al hijo directo, o usar un `div` de contenedor.
 
 **Y el techo de 17 caracteres por segundo también vale acá.** 26 caracteres son
 1,53 s; 32 son 1,88 s. Es la diferencia entre una apertura que respira y una que
@@ -1027,6 +1047,11 @@ tl.to('.cuerpo', {strokeDashoffset: 0, duration: .45, stagger: {amount: .70}}, D
 Un solo tween, 179 trazos, todos tardan lo mismo. **El `pathLength` se pone en
 el generador del SVG, no después.**
 
+📌 La receta de `skills/hyperframes-animation/techniques.md` río arriba todavía
+clava un `stroke-dasharray: 280` a mano y sugiere `path.getTotalLength()`. Sirve
+para **un** trazo; para un dibujo de muchos obliga a un cálculo por elemento y
+no da un corrimiento parejo. `pathLength="1"` lo resuelve en el marcado.
+
 ### 🚨 `vector-effect: non-scaling-stroke` y `pathLength` no conviven
 
 Puesto junto al guion normalizado, el trazo **aparece punteado desde el cuadro
@@ -1108,9 +1133,64 @@ no se eligen — los dicta la locución.
 
 ## Movimiento: curvas, barrido y ritmo
 
-### No hay obturador: **todo el motion blur es autoreado**
-No existe estela natural. Regla: *lo que se mueve rápido se desenfoca en la
-dirección en que se mueve, y recupera el foco al frenar.* A 60 fps no es opcional.
+### 🔄 El obturador SÍ existe: `npx hyperframes add motion-blur`
+
+**Esta lección decía lo contrario y estaba desactualizada.** Decía "no hay
+obturador: todo el motion blur es autoreado". Hoy hay dos mecanismos reales y
+hay que elegir a sabiendas.
+
+**1 · El componente del catálogo** (`npx hyperframes add motion-blur`). Corre
+dentro de la página: después de cada cuadro reposiciona la línea de tiempo en
+`samplesPerFrame` tiempos sub-cuadro, lee la **matriz `transform` resuelta** de
+cada copia y las apila con `mix-blend-mode: plus-lighter` a 1/N de opacidad. El
+promedio de esas copias **es** la integral del obturador.
+
+Que lea la matriz resuelta y no una lista de propiedades es lo que lo cambia
+todo: **traslación, escala, rotación, rotación 3D y sesgo salen todos de la
+misma cuenta**. Es decir, **cubre el zoom**, que es justo donde la fórmula a
+mano no llega (ver *El barrido de un zoom es RADIAL*).
+
+A/B pareado sobre el mismo cuadro del lab-40, en el pico de un zoom a 7,5×:
+
+| | energía de detalle | render de 15 s |
+|---|---|---|
+| sin barrido | — | **18 s** |
+| `backdrop-filter` radial a mano | 9,10 | 18 s |
+| componente · 16 muestras | **11,63** (1,28×) | 3 m 16 s (**10,6×**) |
+| componente · 6 muestras | 12,33 | 1 m 9 s (3,8×) |
+
+El desenfoque a mano es una gaussiana de pantalla: **borra el dibujo entero**.
+El componente integra sobre la trayectoria real, así que la línea se mantiene
+nítida a lo largo y sólo se abre en la dirección del movimiento.
+
+⚠️ **La energía de detalle no es una medida de calidad del barrido.** Con 6
+muestras da *más* que con 16 porque la escalera de fantasmas es más gruesa, y un
+laplaciano cuenta ese escalón como detalle. Hubo que **mirar el cuadro ampliado**
+para confirmar que a esta longitud de estela las dos son indistinguibles. La
+regla real: **las muestras se escalan con el largo de la estela, no se fijan.**
+
+**Lo que cuesta:** N+1 copias del subárbol entero, reestiladas en cada cuadro.
+En un movimiento de cámara lo que se mueve es *todo*, así que se pagan 17 copias
+de 179 trazos. Apuntarlo al elemento que se mueve, nunca a un contenedor de más.
+
+**Las tres trampas de uso:**
+- Se llama **después** de definir todos los tweens y **antes** de registrar en
+  `window.__timelines`.
+- Se le pasa `fps` explícito: si no, lo saca del `data-fps` del root.
+- Una copia **pierde el `id` y conserva las clases**. Después de enganchar,
+  al elemento se lo direcciona por `id`, nunca por una clase que las copias
+  también llevan.
+
+**2 · El obturador del motor** (v0.8.45+, configuración de render, todavía sin
+flag de CLI): re-renderiza la página en varios instantes de la ventana y los
+promedia píxel a píxel. Desde v0.8.46 elige entre 16 y 64 muestras **midiendo
+cuánto se movió cada cuadro**. Es el camino correcto cuando el movimiento no es
+un `transform` — pero no está disponible en la versión que pinea el kit.
+
+**3 · A mano**, que sigue valiendo cuando lo anterior no aplica (ruta del
+compositor por capas, contenido que no se mueve por `transform`, o cuando el
+costo de 10× no entra): *lo que se mueve rápido se desenfoca en la dirección en
+que se mueve, y recupera el foco al frenar.* A 60 fps no es opcional.
 
 ### Para que algo viaje sobre su propio eje, la rotación va en el envoltorio
 
@@ -1261,6 +1341,49 @@ normalización va con curva (`((d−lo)/rango)**1.6`) para marcar el ataque.
 
 ## Entrega y formatos
 
+### 🆕 Una composición, N videos: `--variables` y `--batch`
+
+La tanda de creativos no se hace duplicando la composición. Se declara qué
+cambia y se pasa una tabla:
+
+```html
+<div id="b" data-composition-id="b" data-start="0" data-duration="2"
+     data-width="1080" data-height="1080" data-fps="60"
+     data-composition-variables='{"titulo":{"type":"string","default":"Producto"},
+                                  "precio":{"type":"string","default":"$0"}}'>
+```
+```js
+const v = window.__hyperframes.getVariables();
+document.getElementById('tt').textContent = v.titulo;
+```
+```bash
+npx hyperframes render --batch filas.json
+```
+
+`filas.json` es un array de objetos: **un video por fila**, más un
+`renders/manifest.json` que dice cuál salió de cuál. Medido en la versión que
+pinea el kit: 3 filas, **3,6 s por video**, cero duplicación de HTML.
+
+`--strict-variables` hace fallar el render si una clave no está declarada o
+tiene el tipo equivocado; sin la bandera son avisos.
+
+**Esto es lo que convierte una pieza en una tanda.** Diez ángulos de un anuncio
+son diez filas de un JSON, no diez carpetas.
+
+### 🆕 Las salidas que no son MP4
+
+Ya están en la versión del kit y ninguna aparecía acá:
+
+| Bandera | Para qué |
+|---|---|
+| `--format mov` · `--format webm` | **con transparencia** — para montar sobre metraje en otra herramienta |
+| `--format png-sequence` | cuadros RGBA a un directorio, para entrar a otro editor |
+| `--resolution 4k` \| `portrait-4k` \| `square` | la composición no cambia: Chrome captura con más DPR. La proporción tiene que coincidir y la escala ser múltiplo entero |
+| `--quality delivery` | por encima del `looks` (CRF 16) por defecto |
+
+La `--resolution` es la que más rinde: **una sola composición a 1080 sirve para
+entregar en 4K** sin tocar un número.
+
 ### Entrega: el render del motor es mucho más pesado de lo necesario
 
 Sale a ~17 Mbps; una pieza de 18 s pesa 38 MB y no pasa un límite de subida de
@@ -1278,6 +1401,29 @@ texto u objeto claro bajo el chrome. Textura de fondo ahí es correcta.
 ---
 
 ## Método e instrumentos
+
+### 🚨 El motor se mueve todos los días: mirar la versión antes de creerle a esta hoja
+
+El kit pinea `hyperframes@0.7.109`. Al escribir esto la publicada era
+**0.8.46**, del mismo día, y el repo saca **varias versiones por día**. Una
+hoja de lecciones envejece contra un motor así, y dos de acá ya envejecieron:
+el obturador y la lista de formatos de salida.
+
+Antes de dar por buena una afirmación sobre lo que el motor *no puede*:
+
+```bash
+npm view hyperframes version                     # qué hay publicado
+gh release view vX.Y.Z --repo heygen-com/hyperframes --json body -q .body
+npx hyperframes render --help                    # qué acepta la versión LOCAL
+npx hyperframes add <componente>                 # qué trae el catálogo
+```
+
+Y el repo publica **sus propias skills** en `skills/` —21 de ellas, entre otras
+`motion-graphics`, `hyperframes-animation` y `hyperframes-keyframes`—. Son la
+versión canónica de lo que hace esta hoja: conviene leerlas antes de inventar,
+**y no darlas por correctas sin medir**. Dos afirmaciones de acá salieron de
+medir contra ellas: una las mejora (`pathLength="1"`) y otra corrigió una
+hipótesis mía que era falsa (el `tl.call` del tipeo).
 
 ### 🚨 Los valores relativos (`+=`, `-=`) rompen bajo render en paralelo
 Un valor relativo **captura su base al inicializar el tween**. El render reparte
