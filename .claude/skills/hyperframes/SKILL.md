@@ -327,11 +327,15 @@ Skip on small edits (fixing a color, adjusting one duration). Run on new composi
 
 ## References (loaded on demand)
 
+- **[../../scripts/lab/README.md](../../scripts/lab/README.md)** — las siete herramientas de
+  medición y master del laboratorio, y el orden en que se usan. Leer antes de dar
+  una pieza por terminada.
 - **[references/lecciones-medidas.md](references/lecciones-medidas.md)** — ⭐ **Leer primero.**
-  Lo aprendido produciendo contra las 22 referencias del board, medido en vez de estimado:
+  Noventa lecciones producidas contra referencias reales, medidas en vez de estimadas:
   las trampas del motor de captura por seek, la escala real de un travelling, cómo se
   ilumina un objeto, por qué no se puede medir texto antes de `document.fonts.ready`,
-  los siete layouts de composición, el ritmo, el audio y el método de verificación.
+  el material vectorial y sus pivotes, los layouts de composición, el ritmo, el audio
+  y el método de verificación.
   **Donde contradiga al resto del skill, gana: está medido.**
 
 - **[references/captions.md](references/captions.md)** — Captions, subtitles, lyrics, karaoke synced to audio. Tone-adaptive style detection, per-word styling, text overflow prevention, caption exit guarantees, word grouping. Read when adding any text synced to audio timing.
