@@ -32,3 +32,14 @@ raw-media/
 **/renders/frames/
 **/renders/frames-*/
 
+
+# ── Credentials and secrets — ePIDS standard block (ISMS B39, 2026-09-25) ──
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+.netrc
+service-account*.json
+gha-creds-*.json
