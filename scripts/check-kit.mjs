@@ -14,6 +14,7 @@ const publicMedia = new Set([
   'examples/showcase/curiosity-reel-2.mp4',
   'examples/showcase/curiosity-reel-1.mp4',
   'examples/showcase/ais-live-ad.mp4',
+  'examples/showcase/youtube-showreel.mp4',
 ]);
 if (!readFileSync(join(root,'AGENTS.md')).equals(readFileSync(join(root,'CLAUDE.md')))) fail('Root instruction files differ');
 const sync = spawnSync(process.execPath, [join(root,'scripts/sync-codex-skills.mjs'),'--check'], {encoding:'utf8'});

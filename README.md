@@ -4,9 +4,20 @@ Nate Herk's reusable video-editing kit for **Codex and Claude Code**.
 Bring your own footage. Cut dead air, review mistakes, plan the story, and build
 motion graphics with HyperFrames and GSAP.
 
-## Short-form examples
+## Examples
 
-Three finished videos created by Nate. Press Play to watch here in the README.
+Four finished videos made with this kit.
+
+### YouTube motion showreel
+
+Made with the `motion-showreel` skill: 15 seconds, 1920x1080, 60fps, cut to a
+129 BPM grid. The red scrubber dot travels through seven craft chapters and
+lands as the play button in the logo. Click the frame to watch.
+
+[![YouTube motion showreel: a red lacquer play button with a lookdev readout](docs/images/youtube-showreel.jpg)](examples/showcase/youtube-showreel.mp4)
+
+The three short-form videos below were created by Nate. Press Play to watch
+here in the README.
 
 ### Curiosity reel: unlock your project
 
