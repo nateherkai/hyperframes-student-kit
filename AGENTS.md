@@ -21,6 +21,7 @@ For one stage, load the matching local skill:
 | Need | Skill |
 | --- | --- |
 | Reels, Shorts, and short advertisements | `short-form-edit` |
+| Motion-design showreels and brand reels cut to music | `motion-showreel` |
 | Existing May Shorts example maintenance | `short-form-video` |
 | New motion-graphics video from a brief | `make-a-video` |
 | Website-inspired compositions | `website-to-hyperframes` |

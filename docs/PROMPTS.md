@@ -17,6 +17,10 @@ the speaker readable. Follow the project's DESIGN.md.
 **Verify:** Inspect the actual rendered MP4, its transition frames, and its audio
 joins. Fix visible defects and write VERIFY.md with evidence and limitations.
 
+**Showreel:** Use motion-showreel to build a 15-second showreel for [brand] from
+[music or reference]. Measure the beat grid first, map six or seven chapters to the
+brand's own objects, and show me the storyboard and beat sheet before building.
+
 ## A reel with a clear payoff
 
 > Use short-form-edit to create a 9:16 reel from [local recording]. Explore three

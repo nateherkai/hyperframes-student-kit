@@ -90,8 +90,10 @@ Nate uses [Kie.ai](https://kie.ai/) for generated video and image assets. Set
 task status, and credits.
 
 The short-form skill describes a Kie workflow; the kit does **not** bundle a
-universal Kie generation script or connected account. Ask the assistant to configure
-your selected model using current documentation. Adding a key alone does not
+universal Kie generation script or connected account. The `motion-showreel` skill
+includes a small client (`scripts/kie.mjs`) for its three showreel assets: Suno
+instrumental music, Seedream stills from a logo reference, and Kling camera moves.
+Ask the assistant to configure your selected model using current documentation. Adding a key alone does not
 create an integration. Model inputs, formats, availability, and credit costs vary.
 
 Prepare the proposed assets and expected cost before paid work that you have not
@@ -116,6 +118,9 @@ These are workflow options, not a claim that every example used them:
   needs its own key and the same transcript normalization checks.
 - **Older integration examples:** ClickUp or OpenAI access is needed only when
   your selected project actually calls those services.
+- **Sound effects:** `motion-showreel` can generate an SFX kit with ElevenLabs
+  sound generation (`scripts/sfx.mjs`). It uses `ELEVENLABS_API_KEY`; the key needs
+  sound-effects access as well as `speech_to_text`. Your own SFX library works too.
 - **Helper runtimes:** some optional scripts require Python. Playwright is
   included for relevant browser workflows; browser binaries may need installation.
 

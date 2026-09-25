@@ -1,0 +1,80 @@
+<!--
+  motion-showreel HUD layer. Paste the <style> block into the composition's <style>,
+  the #hud markup as the LAST child of #root (above flash/vignette/grain), and call
+  hudFrame(t) from the per-frame driver (a pure function of t, so it is seek-safe).
+
+  Swap per brand:
+    --hud-acc        brand accent (the motif color)
+    .hud-tl          brand mark + "BRAND  /  MOTION REEL"
+    .hud-tr          spec line: resolution, fps, measured BPM (use the real measured value)
+    #ptime           use the brand's own time format if it has one (YouTube: "0:02 / 0:15"),
+                     otherwise "TC 00:00:02:36"
+    CH               chapter labels, in the brand's language where possible
+    SEGB             chapter boundaries in beats -> gaps in the progress bar
+    paperRanges      time ranges where the background is light, so the HUD flips to ink
+-->
+<style>
+  #hud { position: absolute; inset: 0; z-index: 95; color: rgba(241, 241, 241, 0.88); --hud-acc: #ff0033; }
+  #hud.paper { color: rgba(15, 15, 15, 0.85); }
+  #hud .mono { font-family: "Roboto Mono", monospace; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; }
+  .cm { position: absolute; width: 30px; height: 30px; border-color: currentColor; border-style: solid; border-width: 0; }
+  .cm.tl { left: 36px; top: 36px; border-left-width: 2px; border-top-width: 2px; }
+  .cm.tr { right: 36px; top: 36px; border-right-width: 2px; border-top-width: 2px; }
+  .cm.bl { left: 36px; bottom: 36px; border-left-width: 2px; border-bottom-width: 2px; }
+  .cm.br { right: 36px; bottom: 36px; border-right-width: 2px; border-bottom-width: 2px; }
+  .hud-tl, .hud-tr { position: absolute; top: 62px; font-size: 16px; line-height: 24px; white-space: pre; }
+  .hud-tl { left: 72px; }
+  .hud-tr { right: 72px; }
+  #rec { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--hud-acc); margin-right: 12px; vertical-align: 1px; }
+  #ptime { position: absolute; left: 72px; top: 996px; font-size: 22px; font-weight: 500; }
+  #hbar { position: absolute; left: 640px; top: 1006px; width: 640px; height: 5px; }
+  .hseg { position: absolute; top: 0; height: 5px; background: rgba(255, 255, 255, 0.26); overflow: hidden; }
+  #hud.paper .hseg { background: rgba(15, 15, 15, 0.16); }
+  .hseg .buf { position: absolute; left: 0; top: 0; height: 100%; background: rgba(255, 255, 255, 0.28); }
+  #hud.paper .hseg .buf { background: rgba(15, 15, 15, 0.14); }
+  .hseg .pl { position: absolute; left: 0; top: 0; height: 100%; background: var(--hud-acc); }
+  #hdot { position: absolute; top: 2.5px; left: 0; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; border-radius: 50%; background: var(--hud-acc); }
+  .hud-br { position: absolute; right: 72px; top: 996px; font-size: 16px; line-height: 24px; white-space: pre; }
+</style>
+
+<div id="hud">
+  <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  <div class="hud-tl mono">BRAND  /  MOTION REEL</div>
+  <div class="hud-tr mono"><i id="rec"></i>1920×1080  ·  60P  ·  128 BPM</div>
+  <div id="ptime" class="mono">TC 00:00:00:00</div>
+  <div id="hbar"><i id="hdot"></i></div>
+  <div class="hud-br mono"><span id="chlab">01 · PHYSICS</span></div>
+</div>
+
+<script>
+  // Call once after fonts are ready; returns hudFrame(t) for the per-frame driver.
+  function makeHud({ P, END = 15, FPS = 60, CH, SEGB, paperRanges = [], timeFormat = "tc" }) {
+    const $ = (s) => document.querySelector(s);
+    const h = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+    const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+    const pad = (n) => String(n).padStart(2, "0");
+    const GLY = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#/";
+    const hbar = $("#hbar"), hud = $("#hud"), rec = $("#rec"), ptime = $("#ptime"), hdot = $("#hdot"), chlab = $("#chlab");
+    const segs = [];
+    for (let i = 0; i < SEGB.length - 1; i++) {
+      const x0 = ((SEGB[i] * P) / END) * 640 + (i ? 2 : 0), x1 = Math.min(640, ((SEGB[i + 1] * P) / END) * 640) - (i < SEGB.length - 2 ? 2 : 0);
+      const s = document.createElement("div"); s.className = "hseg"; s.style.left = x0 + "px"; s.style.width = x1 - x0 + "px";
+      s.innerHTML = '<i class="buf"></i><i class="pl"></i>'; hbar.insertBefore(s, hdot);
+      segs.push({ pl: s.querySelector(".pl"), buf: s.querySelector(".buf"), x0, w: x1 - x0 });
+    }
+    return function hudFrame(t) {
+      const fr = Math.round(t * FPS), f = t / END;
+      ptime.textContent = timeFormat === "yt" ? `0:${pad(Math.min(END, Math.floor(t + 1e-4)))} / 0:${pad(END)}` : `TC 00:00:${pad(Math.floor(fr / FPS))}:${pad(fr % FPS)}`;
+      segs.forEach((s) => { const x = f * 640 - s.x0; s.pl.style.width = clamp(x, 0, s.w) + "px"; s.buf.style.width = clamp(x + 70, 0, s.w) + "px"; });
+      hdot.style.left = f * 640 + "px";
+      hud.classList.toggle("paper", paperRanges.some(([a, b]) => t >= a && t < b));
+      rec.style.opacity = (t / P) % 1 < 0.5 ? 1 : 0.25; // blinks on the beat
+      let c = CH[0]; for (const e of CH) if (t >= e[0] - 1e-4) c = e;
+      const since = t - c[0];
+      if (since < 0.16 && c[0] > 0) { // scramble-in for 0.16s on every chapter change
+        const n = Math.floor((since / 0.16) * c[1].length);
+        chlab.textContent = c[1].split("").map((ch, i) => (i < n || ch === " " || ch === "·" ? ch : GLY[Math.floor(h(fr * 13 + i) * GLY.length)])).join("");
+      } else chlab.textContent = c[1];
+    };
+  }
+</script>

@@ -22,7 +22,7 @@ https://github.com/user-attachments/assets/4ad48761-d14c-407a-9dec-1b76a9afb04a
 
 ## What's included
 
-- **14 skills**, mirrored for both assistants, with their helper scripts and references.
+- **15 skills**, mirrored for both assistants, with their helper scripts and references.
 - **406 draft motion-graphics cards** across two styles, with manifests, CSS tokens, and editable slots.
 - **Two scene templates:** dark graph paper and a left glass popout.
 - Transcription, silence cutting, mistake detection, reviewed cut rendering,
@@ -106,6 +106,18 @@ The skill includes planning references and validators for caption timing, source
 mapping, scene coverage, and footage reuse. It is an agent-guided workflow;
 review the actual motion and audio before publishing.
 [Short-form walkthrough and validation commands](docs/SHORT-FORM.md).
+
+## Make a motion-design showreel
+
+> Use motion-showreel to make a 15-second showreel for [brand]. Study my reference
+> reel at [local path] if I give one. Pick one motif that transforms through every
+> chapter, cut on the music's beat grid, and end on the logo. Show me the storyboard
+> and beat sheet before building, and confirm before any paid music or asset generation.
+
+Codex: `$motion-showreel`. Claude Code: `/motion-showreel`.
+The skill includes a measured breakdown of the reel it was built from, a chapter
+technique library, a HUD template, and Node tools to analyze a reference video,
+measure a music take's beat grid, splice it onto the cut grid, and premix sound effects.
 
 ## Existing examples and migration
 
